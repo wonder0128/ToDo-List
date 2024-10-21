@@ -1,7 +1,0 @@
-<<<<<<< HEAD
-first File???
-123123
-000000000
-=======
-first FileTEST
->>>>>>> test
