@@ -56,42 +56,30 @@ const container = document.querySelector('.container');
 
 const createTree = function (folder, node) {
     // 여기에서 작업하세요.
-    console.log(folder, container);
-    
-    folder.forEach(tab => {
-        const details = document.createElement('details');
-        const summary = document.createElement('summary');
 
-        summary.textContent = tab.name;
-        details.appendChild(summary);
-        container.appendChild(details);
+    if(folder){
+        for(let i = 0; i < folder.length; i++){
         
-        summary.addEventListener('click', e =>{
-            if(details.classList.contains('open')){
-                summary.style.display = 'none';
-            } else {
-                console.log(tab)
-                if(tab.file.length !== 0){
-                    tab.file.forEach(file => {
-                        const newUl = document.createElement('ul');
-                        const newLi = document.createElement('li');
-                        newLi.textContent = file;
-                        newUl.appendChild(newLi);
-                        details.appendChild(newUl);
-                    })
-                }
-            }
-            // if(tab?.folder){
-            //     createTree(tab.folder, container);
-            // }
+            const details = document.createElement('details');
+            const summary = document.createElement('summary');
+            const newUl = document.createElement('ul');
+    
+            summary.textContent = folder[i].name;
+            details.appendChild(summary); 
+            node.appendChild(details);
             
-        })
-
-    })
-
-
+            if(folder[i].file || folder[i].folder){
+                createTree(folder[i].folder, details);
+                for(let j = 0; j < folder[i].file.length; j++){
+                    const newLi = document.createElement('li');
+                    newLi.textContent = folder[i].file[j];
+                    newUl.appendChild(newLi);
+                    details.appendChild(newUl);
+                } 
+            } 
+        }
+    }
 };
 
 // ! 아래의 코드는 수정하지 마세요 ! //
-
 createTree(folderTemplate, container);
