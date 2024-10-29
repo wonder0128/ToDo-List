@@ -1,6 +1,7 @@
 const todoInput = document.querySelector('#todo-input');
 const todoList = document.getElementById('todo-list');
 
+const savedWeatherData = JSON.parse(localStorage.getItem('saved-weather'));
 const savedTodoList = JSON.parse(localStorage.getItem('saved-items'));
 
 const createTodo = function(storageData) {
@@ -71,28 +72,48 @@ if(savedTodoList) {
     createTodo(item);
   })
 }
-const weatherSearch = function (position) {
+
+const weatherDataActive = function ({location, weather}) {
+  const weatherMainList = ['Clear', 'Clouds', 'Drizzle', 'Rain', 'Snow', 'Thunderstorm'];
+  weather = weatherMainList.includes(weather) ? weather : 'Fog';
+
+  const locationNameTag = document.getElementById('location-name-tag');
+
+  locationNameTag.textContent = location;
+  document.body.style.backgroundImage = `url('./images/${weather}.jpg')`;
+
+  if(!savedWeatherData || savedWeatherData.location !== location || savedWeatherData.weather !== weather) {
+    localStorage.setItem('saved-weather', JSON.stringify({location, weather}));
+  }
+}
+
+const weatherSearch = function ({latitude, longitude}) {
   const apiId = 'd78cb31674ee0bd47baeb82f3b527bb8';
   fetch(
-    `https://api.openweathermap.org/data/2.5/weather?lat=${position.latitude}&lon=${position.longitude}&appid=${apiId}`
+    `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiId}`
   )
   .then((res) => {
     return res.json();
   })
   .then((json) => {
-    console.log(json.name, json.weather[0].description)
+    console.log(json.name, json.weather[0].main)
+    const weatherData = {
+      location: json.name,
+      weather: json.weather[0].main
+    }
+    weatherDataActive(weatherData);
   })
   .catch((err) => {
-    console.err(err)
+    console.error(err)
   })
   
 }
 
-const accessToGeo = function(position) {
-  const positionObj = {
-    latitude: position.coords.latitude,
-    longitude: position.coords.longitude 
-  }
+const accessToGeo = function({coords}) {
+  const {latitude, longitude} = coords
+
+  // Shorthand property
+  const positionObj = {latitude,longitude};
   weatherSearch(positionObj)
 }
 
@@ -102,3 +123,7 @@ const askForLocation = function () {
   });
 }
 askForLocation();
+
+if(savedWeatherData){
+  weatherDataActive(savedWeatherData);
+}
